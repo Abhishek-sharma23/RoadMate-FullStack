@@ -4,7 +4,7 @@ const mongoose = require("mongoose");
 
 const Booking = require("../models/Booking.js");
 const Service = require("../models/Service.js");
-const User = require("../models/User.js");
+const User = require("../models/user.js");
 const authMiddleware = require("../middleware/auth.js");
 
 const router = express.Router();
