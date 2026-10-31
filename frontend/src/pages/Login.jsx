@@ -19,7 +19,7 @@ function Login(){
         setLoginMessage("");
         setLoginLoading(true);
         try{
-    const response=await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`,{
+    const response=await axios.post(`${API}/auth/login`,{
         email:loginData.email.trim(),
         password:loginData.password
     });
