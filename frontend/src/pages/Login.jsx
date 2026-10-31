@@ -18,10 +18,10 @@ function Login(){
         setLoginMessage("");
         setLoginLoading(true);
         try{
-            const response=await axios.post("http://localhost:5000/api/auth/login",{
-                email:loginData.email.trim(),
-                password:loginData.password
-            });
+    const response=await axios.post(`${import.meta.env.VITE_API_URL}/auth/login`,{
+        email:loginData.email.trim(),
+        password:loginData.password
+    });
             const {token,user}=response.data;
             if(!token){
                 setLoginMessage("Login failed: the backend did not return a token. Check the login route in authRoutes.js.");
