@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import "./ProviderDashboard.css";
 import PanelNavigation from "../components/PanelNavigation";
 
-const API_URL = "http://localhost:5000/api/provider";
+const API_URL = `${import.meta.env.VITE_API_URL}/provider`;
 
 function ProviderDashboard() {
     const navigate = useNavigate();

@@ -3,6 +3,7 @@ import {useState} from "react";
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
 import "./Login.css";
+const API=import.meta.env.VITE_API_URL;
 
 function Login(){
     const navigate=useNavigate();
@@ -52,7 +53,7 @@ function Login(){
         }
         setSignupLoading(true);
         try{
-            const response=await axios.post("http://localhost:5000/api/auth/register",{
+            const response=await axios.post(`${API}/auth/register`,{
                 name:signupData.fullname.trim(),
                 email:signupData.email.trim(),
                 password:signupData.password

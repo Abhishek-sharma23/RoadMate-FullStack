@@ -3,6 +3,8 @@ import {useEffect,useState} from "react";
 import {useNavigate,useLocation} from "react-router-dom";
 import axios from "axios";
 import "./Booking.css";
+const API=import.meta.env.VITE_API_URL;
+
 
 const serviceFields={
     "Fuel Delivery":[
@@ -86,12 +88,11 @@ function Booking(){
     const currentServiceName=currentService?.name||formData._serviceName||selectedServiceName;
     const serviceKey=getServiceKey(currentServiceName);
     const fields=serviceFields[serviceKey]||[];
-
-    useEffect(()=>{
-        axios.get("http://localhost:5000/api/services")
-        .then(response=>{
-            const data=response.data;
-            setServices(data);
+useEffect(()=>{
+    axios.get(`${API}/services`)
+    .then(response=>{
+        const data=response.data;
+        setServices(data);
             const matchedService=data.find(service=>service._id===selectedServiceId)||
                 data.find(service=>getServiceKey(service.name)===getServiceKey(selectedServiceName)&&getServiceKey(selectedServiceName)!=="");
             if(matchedService){
@@ -155,10 +156,10 @@ function Booking(){
                 description
             };
             const response=await axios.post(
-                "http://localhost:5000/api/bookings",
-                payload,
-                {headers:{Authorization:`Bearer ${token}`}}
-            );
+    `${API}/bookings`,
+    payload,
+    {headers:{Authorization:`Bearer ${token}`}}
+);
             setMessage(response.data.message||"Your booking has been submitted successfully!");
             setMessageType("success");
             setFormData(previous=>({

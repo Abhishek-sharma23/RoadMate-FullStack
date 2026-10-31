@@ -3,6 +3,7 @@ import {useNavigate} from "react-router-dom";
 import axios from "axios";
 import "./Dashboard.css";
 import PanelNavigation from "../components/PanelNavigation";
+const API=import.meta.env.VITE_API_URL;
 
 const serviceImages={
     "ON ROAD FUEL DEMAND":"https://images.unsplash.com/photo-1542362567-b07e54358753?auto=format&fit=crop&w=700&q=80",
@@ -31,14 +32,14 @@ function Dashboard(){
     const [contactLoading,setContactLoading]=useState(false);
 
     useEffect(()=>{
-        axios.get("http://localhost:5000/api/services")
-        .then(response=>{
-            const apiServices=Array.isArray(response.data)?response.data:[];
-            const orderedServices=serviceDetails.map(detail=>{
-                const existing=apiServices.find(service=>
-                    service.category?.trim().toLowerCase()===detail.category.toLowerCase()||
-                    service.name?.trim().toLowerCase()===detail.category.toLowerCase()
-                );
+    axios.get(`${API}/services`)
+    .then(response=>{
+        const apiServices=Array.isArray(response.data)?response.data:[];
+        const orderedServices=serviceDetails.map(detail=>{
+            const existing=apiServices.find(service=>
+                service.category?.trim().toLowerCase()===detail.category.toLowerCase()||
+                service.name?.trim().toLowerCase()===detail.category.toLowerCase()
+            );
                 return {
                     ...detail,
                     _id:existing?._id||null,
@@ -79,7 +80,7 @@ function Dashboard(){
         setContactLoading(true);
 
         try{
-            const response=await axios.post("http://localhost:5000/api/contact",data);
+            const response=await axios.post(`${API}/contact`,data);
             setContactStatus(response.data.message||"Your message has been sent successfully!");
             form.reset();
         }catch(error){

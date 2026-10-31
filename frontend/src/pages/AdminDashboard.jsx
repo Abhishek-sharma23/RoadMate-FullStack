@@ -5,7 +5,8 @@ import axios from "axios";
 import "./AdminDashboard.css";
 import PanelNavigation from "../components/PanelNavigation";
 
-const API="http://localhost:5000/api";
+
+const API=import.meta.env.VITE_API_URL;
 const auth=()=>({headers:{Authorization:`Bearer ${localStorage.getItem("token")}`}});
 
 function AdminDashboard(){

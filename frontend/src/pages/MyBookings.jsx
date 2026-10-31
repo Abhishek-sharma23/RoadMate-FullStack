@@ -3,6 +3,7 @@ import {useEffect,useState,useCallback} from "react";
 import {useNavigate} from "react-router-dom";
 import axios from "axios";
 import "./MyBookings.css";
+const API=import.meta.env.VITE_API_URL;
 
 function MyBookings(){
     const navigate=useNavigate();
@@ -19,7 +20,7 @@ function MyBookings(){
             return;
         }
         try{
-            const response=await axios.get("http://localhost:5000/api/bookings/my-bookings",{
+            const response=await axios.get(`${API}/bookings/my-bookings`,{
                 headers:{Authorization:`Bearer ${token}`}
             });
             setBookings(Array.isArray(response.data)?response.data:[]);
@@ -41,12 +42,12 @@ function MyBookings(){
         setCancellingId(id);
         setError("");
         setMessage("");
-        try{
-            const response=await axios.patch(
-                `http://localhost:5000/api/bookings/${id}/cancel`,
-                {},
-                {headers:{Authorization:`Bearer ${token}`}}
-            );
+       try{
+    const response=await axios.patch(
+        `${API}/bookings/${id}/cancel`,
+        {},
+        {headers:{Authorization:`Bearer ${token}`}}
+    );
             setBookings(previous=>previous.map(booking=>
                 booking._id===id?{...booking,status:response.data.booking.status}:booking
             ));

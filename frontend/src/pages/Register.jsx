@@ -1,5 +1,6 @@
 import {useState} from "react";
 import axios from "axios";
+const API=import.meta.env.VITE_API_URL;
 
 function Register(){
     const [formData,setFormData]=useState({
@@ -19,14 +20,14 @@ function Register(){
         e.preventDefault();
         alert("Button is working");
 
-        try{
-            const response=await axios.post("http://localhost:5000/api/auth/register",formData);
-            alert(response.data.message);
-        }catch(error){
-            console.log(error);
-            alert(error.response?.data?.message||"Registration failed");
-        }
-    };
+            try{
+                const response=await axios.post(`${API}/auth/register`,formData);
+                alert(response.data.message);
+            }catch(error){
+                console.log(error);
+                alert(error.response?.data?.message||"Registration failed");
+            }
+        };
 
     return(
         <div>

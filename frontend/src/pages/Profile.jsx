@@ -3,6 +3,7 @@ import {useEffect,useState} from "react";
 import axios from "axios";
 import {useNavigate} from "react-router-dom";
 import "./Profile.css";
+const API=import.meta.env.VITE_API_URL;
 
 function Profile(){
     const navigate=useNavigate();
@@ -17,19 +18,18 @@ function Profile(){
     const token=localStorage.getItem("token");
 
     useEffect(()=>{
-        if(!token){
-            navigate("/login");
-            return;
-        }
-
-        axios.get("http://localhost:5000/api/auth/me",{
-            headers:{Authorization:`Bearer ${token}`}
-        })
-        .then(response=>{
-            const data=response.data.user;
-            setUser(data);
-            setName(data.name||data.fullname||"");
-        })
+    if(!token){
+        navigate("/login");
+        return;
+    }
+    axios.get(`${API}/auth/me`,{
+        headers:{Authorization:`Bearer ${token}`}
+    })
+    .then(response=>{
+        const data=response.data.user;
+        setUser(data);
+        setName(data.name||data.fullname||"");
+    })
         .catch(error=>{
             setError(error.response?.data?.message||"Unable to load your profile.");
         })
@@ -42,17 +42,16 @@ function Profile(){
             return;
         }
 
-        setSaving(true);
-        setError("");
-        setSuccess("");
+      setSaving(true);
+setError("");
+setSuccess("");
 
-        try{
-            const response=await axios.put(
-                "http://localhost:5000/api/auth/me",
-                {name:name.trim()},
-                {headers:{Authorization:`Bearer ${token}`}}
-            );
-
+try{
+    const response=await axios.put(
+        `${API}/auth/me`,
+        {name:name.trim()},
+        {headers:{Authorization:`Bearer ${token}`}}
+    );
             const updatedUser=response.data.user||{...user,name:name.trim()};
             setUser(updatedUser);
             setName(updatedUser.name||updatedUser.fullname||name.trim());
