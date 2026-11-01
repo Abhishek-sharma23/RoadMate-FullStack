@@ -1,25 +1,7 @@
 
 const express=require("express");
-const nodemailer=require("nodemailer");
 const router=express.Router();
 
-const transporter=nodemailer.createTransport({
-    host:"smtp.gmail.com",
-    port:465,
-    secure:true,
-    auth:{
-        user:process.env.EMAIL_USER?.trim(),
-        pass:process.env.EMAIL_APP_PASSWORD?.replace(/\s/g,"")
-    },
-    connectionTimeout:15000,
-    greetingTimeout:15000,
-    socketTimeout:20000
-});
-
-console.log("Transporter auth user:",!!transporter.options.auth?.user);
-console.log("Transporter auth password:",!!transporter.options.auth?.pass);
-console.log("Email user length:",process.env.EMAIL_USER?.trim().length);
-console.log("Email password length:",process.env.EMAIL_APP_PASSWORD?.replace(/\s/g,"").length);
 router.post("/",async(req,res)=>{
     try{
         const {name,email,subject,message}=req.body;
@@ -33,21 +15,41 @@ router.post("/",async(req,res)=>{
         }
 
         const emailPattern=/^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
         if(!emailPattern.test(email.trim())){
             return res.status(400).json({message:"Please enter a valid email address."});
         }
 
-        if(!process.env.EMAIL_USER||!process.env.EMAIL_APP_PASSWORD||!process.env.CONTACT_EMAIL){
-            console.error("Email configuration is missing.");
+        const apiKey=process.env.BREVO_API_KEY?.trim();
+        const senderEmail=process.env.BREVO_SENDER_EMAIL?.trim();
+        const contactEmail=process.env.CONTACT_EMAIL?.trim();
+
+        if(!apiKey||!senderEmail||!contactEmail){
+            console.error("Brevo configuration is missing.");
             return res.status(500).json({message:"Email service is not configured."});
         }
 
-        await transporter.sendMail({
-            from:process.env.EMAIL_USER.trim(),
-            to:process.env.CONTACT_EMAIL.trim(),
-            replyTo:email.trim(),
-            subject:"RoadMate Contact: "+subject.trim(),
-            text:`New message from the RoadMate contact form
+        const response=await fetch("https://api.brevo.com/v3/smtp/email",{
+            method:"POST",
+            headers:{
+                "accept":"application/json",
+                "api-key":apiKey,
+                "content-type":"application/json"
+            },
+            body:JSON.stringify({
+                sender:{
+                    name:"RoadMate",
+                    email:senderEmail
+                },
+                to:[{
+                    email:contactEmail
+                }],
+                replyTo:{
+                    email:email.trim(),
+                    name:name.trim()
+                },
+                subject:"RoadMate Contact: "+subject.trim(),
+                textContent:`New message from RoadMate contact form
 
 Name: ${name.trim()}
 Email: ${email.trim()}
@@ -55,13 +57,28 @@ Subject: ${subject.trim()}
 
 Message:
 ${message.trim()}`
+            })
         });
 
-        return res.status(200).json({message:"Your message has been sent successfully!"});
-    }catch(error){
-        console.error("Contact email error:",error.message);
-        return res.status(500).json({message:"Unable to send your message right now. Please try again later."});
-    }
+        const result=await response.json().catch(()=>({}));
+
+        if(!response.ok){
+            console.error("Brevo API error:",response.status,result);
+            return res.status(500).json({message:"Unable to send your message right now. Please try again later."});
+        }
+
+        console.log("Contact email sent successfully:",result.messageId);
+
+        return res.status(200).json({
+            message:"Your message has been sent successfully!"
+        });
+
+   }catch(error){
+    console.error("Contact email error:",error);
+    return res.status(500).json({
+        message:"Unable to send your message right now. Please try again later."
+    });
+}
 });
 
 module.exports=router;
