@@ -5,12 +5,15 @@ const router=express.Router();
 
 const transporter=nodemailer.createTransport({
     host:"smtp.gmail.com",
-    port:587,
-    secure:false,
+    port:465,
+    secure:true,
     auth:{
         user:process.env.EMAIL_USER?.trim(),
         pass:process.env.EMAIL_APP_PASSWORD?.replace(/\s/g,"")
-    }
+    },
+    connectionTimeout:15000,
+    greetingTimeout:15000,
+    socketTimeout:20000
 });
 
 console.log("Transporter auth user:",!!transporter.options.auth?.user);
